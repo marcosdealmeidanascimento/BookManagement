@@ -1,7 +1,7 @@
 package com.example.bookmanagement.categories;
 
 
-import com.example.bookmanagement.books.Books;
+import com.example.bookmanagement.book.Book;
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -18,7 +18,7 @@ public class Categories {
     )
 
     @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
+            strategy = GenerationType.IDENTITY,
             generator = "categories_sequence"
     )
 
@@ -28,7 +28,7 @@ public class Categories {
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinTable(name = "BOOKS_CATEGORIES_MAPPING", joinColumns = @JoinColumn(name = "category_id"), inverseJoinColumns = @JoinColumn(name = "book_id"))
-    private Set<Books> books;
+    private Set<Book> books;
 
     public Categories(){}
 
@@ -55,5 +55,14 @@ public class Categories {
     public void setCategoryName(String categoryName) {
         if (categoryName == null || categoryName.isBlank()) throw new IllegalStateException("The name of the category must not be empty!");
         this.categoryName = categoryName;
+    }
+
+    @Override
+    public String toString() {
+        return "Categories{" +
+                "categoryId=" + categoryId +
+                ", categoryName='" + categoryName + '\'' +
+                ", books=" + books +
+                '}';
     }
 }
