@@ -1,12 +1,14 @@
 package com.example.bookmanagement.book;
 
-import com.example.bookmanagement.categories.Categories;
+import com.example.bookmanagement.category.Category;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLDelete;
 
 import java.util.Set;
 
 @Entity
 @Table(name = "BOOKS")
+@SQLDelete(sql = "UPDATE BOOKS SET deleted = true WHERE book_id=?")
 public class Book {
 
     @Id
@@ -25,13 +27,14 @@ public class Book {
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinTable(name = "BOOKS_CATEGORIES_MAPPING", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Categories> categories;
+    private Set<Category> categories;
     private String bookCode;
     private String bookName;
     private int year;
     private String edition;
     private String numberOfPages;
-    private boolean status;
+    private boolean status = Boolean.FALSE;
+    private boolean deleted = Boolean.FALSE;
 
     public Book() {}
 
@@ -42,7 +45,6 @@ public class Book {
         setYear(year);
         setEdition(edition);
         setNumberOfPages(numberOfPages);
-        this.status = false;
     }
 
     public Book(String bookName, String bookCode, int year, String edition, String numberOfPages) {
@@ -51,7 +53,6 @@ public class Book {
         setYear(year);
         setEdition(edition);
         setNumberOfPages(numberOfPages);
-        this.status = false;
     }
 
 
@@ -63,11 +64,11 @@ public class Book {
         this.bookId = bookId;
     }
 
-    public Set<Categories> getCategories() {
+    public Set<Category> getCategories() {
         return categories;
     }
 
-    public void setCategories(Set<Categories> categories) {
+    public void setCategories(Set<Category> categories) {
         this.categories = categories;
     }
 

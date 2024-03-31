@@ -1,4 +1,4 @@
-package com.example.bookmanagement.categories;
+package com.example.bookmanagement.category;
 
 
 import com.example.bookmanagement.book.Book;
@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "CATEGORIES")
-public class Categories {
+public class Category {
 
     @Id
     @SequenceGenerator(
@@ -25,18 +25,17 @@ public class Categories {
     private Long categoryId;
     private String categoryName;
 
-
     @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinTable(name = "BOOKS_CATEGORIES_MAPPING", joinColumns = @JoinColumn(name = "category_id"), inverseJoinColumns = @JoinColumn(name = "book_id"))
     private Set<Book> books;
 
-    public Categories(){}
+    public Category(){}
 
-    public Categories(Long categoryId, String categoryName) {
+    public Category(Long categoryId, String categoryName) {
         setCategoryId(categoryId);
         setCategoryName(categoryName);
     }
-    public Categories(String categoryName) {
+    public Category(String categoryName) {
         setCategoryName(categoryName);
     }
 
@@ -56,6 +55,10 @@ public class Categories {
         if (categoryName == null || categoryName.isBlank()) throw new IllegalStateException("The name of the category must not be empty!");
         this.categoryName = categoryName;
     }
+
+    public Set<Book> getBooks() { return books; }
+
+    public void setBooks(Set<Book> books) { this.books = books; }
 
     @Override
     public String toString() {

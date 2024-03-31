@@ -1,5 +1,6 @@
 package com.example.bookmanagement.book;
 
+import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,13 @@ public class BookController {
 
     @DeleteMapping(path = "{bookId}")
     public void deleteBook(@PathVariable("bookId") Long bookId) {
-
+        bookService.deleteBook(bookId);
     }
+
+    @PostMapping(value = "/assignBookToCategory/{bookId}")
+    public void assignBookToCategory(@PathVariable("bookId") Long bookId, @PathParam("categoryId") Long categoryId) {
+        bookService.assignBookToCategory(bookId, categoryId);
+    }
+
 
 }
