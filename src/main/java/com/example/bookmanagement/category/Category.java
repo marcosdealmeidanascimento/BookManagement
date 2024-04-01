@@ -3,6 +3,7 @@ package com.example.bookmanagement.category;
 
 import com.example.bookmanagement.book.Book;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLDelete;
 
 import java.util.Set;
 
@@ -11,15 +12,8 @@ import java.util.Set;
 public class Category {
 
     @Id
-    @SequenceGenerator(
-            name = "categories_sequence",
-            sequenceName = "categories_sequence",
-            allocationSize = 1
-    )
-
     @GeneratedValue(
-            strategy = GenerationType.IDENTITY,
-            generator = "categories_sequence"
+            strategy = GenerationType.IDENTITY
     )
 
     private Long categoryId;

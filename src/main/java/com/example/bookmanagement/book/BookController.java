@@ -16,7 +16,10 @@ public class BookController {
     public BookController(BookService bookService) { this.bookService = bookService; }
 
     @GetMapping
-    public List<Book> getAllBooks() { return bookService.getAllBooks(); }
+    public Iterable<Book> getAllActiveBooks() { return bookService.getAllActiveBooks(); }
+
+    @GetMapping(path = "/all")
+    public Iterable<Book> getAllBooks() { return bookService.getAllBooks(); }
 
     @PostMapping
     public void addNewBook(@RequestBody Book book) { bookService.addNewBook(book); }
@@ -34,6 +37,11 @@ public class BookController {
     @PostMapping(value = "/assignBookToCategory/{bookId}")
     public void assignBookToCategory(@PathVariable("bookId") Long bookId, @PathParam("categoryId") Long categoryId) {
         bookService.assignBookToCategory(bookId, categoryId);
+    }
+
+    @PutMapping(value = "/changeStatus/{bookId}")
+    public void changeBookStatus(@PathVariable("bookId") Long bookId, @RequestBody String reason) {
+        bookService.changeBookStatus(bookId, reason);
     }
 
 
