@@ -45,12 +45,6 @@ public class BookStatus {
 
     public BookStatus() {}
 
-    public BookStatus(Long bookStatusId, String reason, Book book) {
-        this.bookStatusId = bookStatusId;
-        setReason(reason);
-        setBook(book);
-    }
-
     public BookStatus(String reason, Book book) {
         setReason(reason);
         setBook(book);

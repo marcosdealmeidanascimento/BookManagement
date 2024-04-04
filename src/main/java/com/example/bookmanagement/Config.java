@@ -2,8 +2,12 @@ package com.example.bookmanagement;
 
 import com.example.bookmanagement.book.Book;
 import com.example.bookmanagement.book.BookRepository;
+import com.example.bookmanagement.bookCategory.BookCategory;
+import com.example.bookmanagement.bookCategory.BookCategoryRepository;
 import com.example.bookmanagement.category.Category;
 import com.example.bookmanagement.category.CategoryRepository;
+import com.example.bookmanagement.priceGroup.PriceGroup;
+import com.example.bookmanagement.priceGroup.PriceGroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -25,20 +29,14 @@ public class Config {
     @Bean
     CommandLineRunner commandLineRunner(
             BookRepository bookRepository,
-            CategoryRepository categoryRepository
+            CategoryRepository categoryRepository,
+            PriceGroupRepository priceGroupRepository,
+            BookCategoryRepository bookCategoryRepository
     ) {
         return args -> {
-            Book b1 = new Book(
-                    "BookTitle",
-                    "Synopsis",
-                    "ISBN",
-                    2024,
-                    "1st Edition",
-                    "123",
-                    10.0f,
-                    20.0f,
-                    30.0f,
-                    100.0f
+            PriceGroup p1 = new PriceGroup(
+                    100.12f,
+                    500.02f
             );
 
             ArrayList<Category> categories = new ArrayList<>();
@@ -52,15 +50,47 @@ public class Config {
                     "Saúde e Fitness", "Tecnologia", "Viagem", "Negócios", "Artes",
                     "Auto-biografia", "Desenvolvimento Pessoal", "Economia",
                     "Ficção Histórica Alternativa", "Ficção Realista", "Investigação",
-                    "Literatura Infantil", "Livros de Referência"
+                    "Literatura Infantil"
             };
 
             for (String categoryName: categoryNames) {
                 categories.add(new Category(categoryName));
             }
 
+            Book b1 = new Book(
+                    "BookTitle",
+                    "Synopsis",
+                    "ISBN",
+                    "",
+                    "",
+                    2024,
+                    "1st Edition",
+                    "123",
+                    10.00f,
+                    20.00f,
+                    30.00f,
+                    100.00f
+            );
+
+            BookCategory bc1 = new BookCategory(new Book("BookTitle",
+                    "Synopsis",
+                    "ISBN",
+                    "",
+                    "",
+                    2024,
+                    "1st Edition",
+                    "123",
+                    10.00f,
+                    20.00f,
+                    30.00f,
+                    100.00f), new Category("Livros de Referência"));
+
             bookRepository.saveAll(List.of(b1));
+            priceGroupRepository.saveAll(List.of(p1));
             categoryRepository.saveAll(categories);
+
+            bookCategoryRepository.save(bc1);
+
         };
     }
 }

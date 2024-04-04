@@ -2,6 +2,7 @@ package com.example.bookmanagement.category;
 
 
 import com.example.bookmanagement.book.Book;
+import com.example.bookmanagement.bookCategory.BookCategory;
 import jakarta.persistence.*;
 import org.hibernate.annotations.SQLDelete;
 
@@ -19,16 +20,16 @@ public class Category {
     private Long categoryId;
     private String categoryName;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
-    @JoinTable(name = "BOOKS_CATEGORIES_MAPPING", joinColumns = @JoinColumn(name = "category_id"), inverseJoinColumns = @JoinColumn(name = "book_id"))
-    private Set<Book> books;
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BookCategory> bookCategories;
 
     public Category(){}
 
     public Category(Long categoryId, String categoryName) {
-        setCategoryId(categoryId);
-        setCategoryName(categoryName);
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
     }
+
     public Category(String categoryName) {
         setCategoryName(categoryName);
     }
@@ -50,16 +51,19 @@ public class Category {
         this.categoryName = categoryName;
     }
 
-    public Set<Book> getBooks() { return books; }
+    public Set<BookCategory> getBookCategories() {
+        return bookCategories;
+    }
 
-    public void setBooks(Set<Book> books) { this.books = books; }
+    public void setBookCategories(Set<BookCategory> bookCategories) {
+        this.bookCategories = bookCategories;
+    }
 
     @Override
     public String toString() {
-        return "Categories{" +
+        return "Category{" +
                 "categoryId=" + categoryId +
                 ", categoryName='" + categoryName + '\'' +
-                ", books=" + books +
                 '}';
     }
 }

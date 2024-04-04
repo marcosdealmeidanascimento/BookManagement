@@ -1,7 +1,8 @@
 package com.example.bookmanagement.book;
 
+import com.example.bookmanagement.bookCategory.BookCategory;
 import com.example.bookmanagement.bookStatus.BookStatus;
-import com.example.bookmanagement.category.Category;
+import com.example.bookmanagement.priceGroup.PriceGroup;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -23,20 +24,33 @@ public class Book {
 
     private Long bookId;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
-    @JoinTable(name = "BOOKS_CATEGORIES_MAPPING", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> categories;
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BookCategory> bookCategories;
+    @Column(name = "book_title", nullable = false)
     private String bookTitle;
+    @Column(name = "synopsis", nullable = false)
     private String synopsis;
     private String bookCode = "BCK_0";
-    private String ISBN;
+    private String isbn;
+    @Column(name = "year", nullable = false)
     private int year;
+    @Column(name = "edition", nullable = false)
     private String edition;
+    @Column(name = "number_of_pages", nullable = false)
     private String numberOfPages;
+    @Column(scale = 2)
+    private float price;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "price_group_id", referencedColumnName = "price_group_id")
+    private PriceGroup priceGroup;
     private String barcode;
+    @Column(columnDefinition = "Decimal(10,2)")
     private float height;
+    @Column(columnDefinition = "Decimal(10,2)")
     private float width;
+    @Column(columnDefinition = "Decimal(10,2)")
     private float depth;
+    @Column(columnDefinition = "Decimal(10,2)")
     private float weight;
     private boolean status = Boolean.FALSE;
     @Transient
@@ -49,12 +63,13 @@ public class Book {
 
     public Book() {}
 
-    public Book(String bookTitle, String synopsis, String ISBN, int year, String edition, String numberOfPages, float height, float width, float depth, float weight) {
+    public Book(Long bookId, String bookTitle, String synopsis, String isbn, String bookCode, String barcode, int year, String edition, String numberOfPages, float height, float width, float depth, float weight) {
+        this.bookId = bookId;
         setBookTitle(bookTitle);
         setSynopsis(synopsis);
-        setBookCode();
-        setBarcode();
-        setISBN(ISBN);
+        setIsbn(isbn);
+        setBookCode(bookCode);
+        setBarcode(barcode);
         setYear(year);
         setEdition(edition);
         setNumberOfPages(numberOfPages);
@@ -64,6 +79,20 @@ public class Book {
         setWeight(weight);
     }
 
+    public Book(String bookTitle, String synopsis, String isbn, String bookCode, String barcode, int year, String edition, String numberOfPages, float height, float width, float depth, float weight) {
+        setBookTitle(bookTitle);
+        setSynopsis(synopsis);
+        setIsbn(isbn);
+        setBookCode(bookCode);
+        setBarcode(barcode);
+        setYear(year);
+        setEdition(edition);
+        setNumberOfPages(numberOfPages);
+        setHeight(height);
+        setWidth(width);
+        setDepth(depth);
+        setWeight(weight);
+    }
     public Long getBookId() {
         return bookId;
     }
@@ -72,22 +101,22 @@ public class Book {
         this.bookId = bookId;
     }
 
-    public Set<Category> getCategories() {
-        return categories;
+    public Set<BookCategory> getBookCategories() {
+        return bookCategories;
     }
 
-    public void setCategories(Set<Category> categories) {
-        this.categories = categories;
+    public void setBookCategories(Set<BookCategory> bookCategories) {
+        this.bookCategories = bookCategories;
     }
 
     public String getBookCode() {
         return bookCode;
     }
 
-    public void setBookCode() {
-        Random random = new Random(LocalDateTime.now().getSecond());
-        long code = random.nextLong(999999) + 1;
-        this.bookCode += Long.toString(code);
+    public void setBookCode(String bookCode) {
+        if (bookCode == null || bookCode.isBlank())
+            bookCode = getCode(99991, 2);
+        this.bookCode += bookCode;
     }
 
     public String getBookTitle() {
@@ -104,12 +133,12 @@ public class Book {
         this.synopsis = synopsis;
     }
 
-    public String getISBN() {
-        return ISBN;
+    public String getIsbn() {
+        return isbn;
     }
 
-    public void setISBN(String ISBN) {
-        this.ISBN = ISBN;
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
     }
 
     public int getYear() {
@@ -136,18 +165,30 @@ public class Book {
         this.numberOfPages = numberOfPages;
     }
 
-    public void setBookCode(String bookCode) {
-        this.bookCode = bookCode;
+    public float getPrice() {
+        return price;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
+    }
+
+    public PriceGroup getPriceGroup() {
+        return priceGroup;
+    }
+
+    public void setPriceGroup(PriceGroup priceGroup) {
+        this.priceGroup = priceGroup;
     }
 
     public String getBarcode() {
         return barcode;
     }
 
-    public void setBarcode() {
-        Random random = new Random(LocalDateTime.now().getSecond());
-        long barcode = random.nextLong((99999999 - 999) + 1) + 999;
-        this.barcode = Long.toString(barcode);
+    public void setBarcode(String barcode) {
+        if (barcode == null || barcode.isBlank())
+            barcode = getCode(99999971, 769);
+        this.barcode = barcode;
     }
 
     public float getHeight() {
@@ -198,16 +239,30 @@ public class Book {
         return modifiedDate;
     }
 
+    protected String getCode(int end, int start) {
+        Random random = new Random(LocalDateTime.now().getSecond());
+        long code = random.nextLong((end - start) + 1) + start;
+        return Long.toString(code);
+    }
+
     @Override
     public String toString() {
         return "Book{" +
                 "bookId=" + bookId +
-                ", categories=" + categories +
                 ", bookTitle='" + bookTitle + '\'' +
+                ", synopsis='" + synopsis + '\'' +
                 ", bookCode='" + bookCode + '\'' +
+                ", isbn='" + isbn + '\'' +
                 ", year=" + year +
                 ", edition='" + edition + '\'' +
                 ", numberOfPages='" + numberOfPages + '\'' +
+                ", price=" + price +
+                ", priceGroup=" + priceGroup +
+                ", barcode='" + barcode + '\'' +
+                ", height=" + height +
+                ", width=" + width +
+                ", depth=" + depth +
+                ", weight=" + weight +
                 ", status=" + status +
                 ", createdDate=" + createdDate +
                 ", modifiedDate=" + modifiedDate +
