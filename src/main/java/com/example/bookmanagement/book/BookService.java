@@ -2,8 +2,6 @@ package com.example.bookmanagement.book;
 
 import com.example.bookmanagement.bookCategory.BookCategory;
 import com.example.bookmanagement.bookCategory.BookCategoryRepository;
-import com.example.bookmanagement.bookStatus.BookStatus;
-import com.example.bookmanagement.bookStatus.BookStatusRepository;
 import com.example.bookmanagement.category.Category;
 import com.example.bookmanagement.category.CategoryRepository;
 import com.example.bookmanagement.priceGroup.PriceGroup;
@@ -20,15 +18,13 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
-    private final BookStatusRepository bookStatusRepository;
     private final PriceGroupRepository priceGroupRepository;
     private final BookCategoryRepository bookCategoryRepository;
 
     @Autowired
-    public BookService(BookRepository bookRepository, CategoryRepository categoryRepository, BookStatusRepository bookStatusRepository, PriceGroupRepository priceGroupRepository, BookCategoryRepository bookCategoryRepository) {
+    public BookService(BookRepository bookRepository, CategoryRepository categoryRepository, PriceGroupRepository priceGroupRepository, BookCategoryRepository bookCategoryRepository) {
         this.bookRepository = bookRepository;
         this.categoryRepository = categoryRepository;
-        this.bookStatusRepository = bookStatusRepository;
         this.priceGroupRepository = priceGroupRepository;
         this.bookCategoryRepository = bookCategoryRepository;
     }
@@ -92,12 +88,10 @@ public class BookService {
 
     public void changeBookStatus(Long bookId, String reason) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalStateException("This book does not exist. Id " + bookId));
-        BookStatus bookStatus = new BookStatus(
-                reason,
-                book
-        );
+        if (reason == null || reason.isBlank()) throw new IllegalStateException("The reason must be entered");
+        book.setReason(reason);
         book.setStatus(!book.getStatus());
-        bookStatusRepository.save(bookStatus);
+        bookRepository.save(book);
     }
 
     public void assignBookToPriceGroup(Long bookId, Long priceGroupId) {

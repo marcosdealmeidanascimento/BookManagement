@@ -1,7 +1,6 @@
 package com.example.bookmanagement.book;
 
 import com.example.bookmanagement.bookCategory.BookCategory;
-import com.example.bookmanagement.bookStatus.BookStatus;
 import com.example.bookmanagement.priceGroup.PriceGroup;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -26,19 +25,19 @@ public class Book {
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookCategory> bookCategories;
-    @Column(name = "book_title", nullable = false)
+    @Column(nullable = false)
     private String bookTitle;
-    @Column(name = "synopsis", nullable = false)
+    @Column(nullable = false)
     private String synopsis;
     private String bookCode = "BCK_0";
     private String isbn;
-    @Column(name = "year", nullable = false)
+    @Column(nullable = false)
     private int year;
-    @Column(name = "edition", nullable = false)
+    @Column(nullable = false)
     private String edition;
-    @Column(name = "number_of_pages", nullable = false)
+    @Column(nullable = false)
     private String numberOfPages;
-    @Column(scale = 2)
+    @Column(columnDefinition = "Decimal(10,2)")
     private float price;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "price_group_id", referencedColumnName = "price_group_id")
@@ -53,9 +52,7 @@ public class Book {
     @Column(columnDefinition = "Decimal(10,2)")
     private float weight;
     private boolean status = Boolean.FALSE;
-    @Transient
-    @OneToMany(mappedBy = "bookStatus")
-    private Set<BookStatus> bookStatuses;
+    private String reason;
     @CreatedDate
     private LocalDateTime createdDate;
     @LastModifiedDate
@@ -229,6 +226,14 @@ public class Book {
 
     public void setStatus(Boolean status) {
         this.status = status;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     public LocalDateTime getCreatedDate() {
